@@ -74,7 +74,7 @@ function evaluateArray(array) {
       currentOperation
     );
   }
-  return array[0];
+  return array;
 }
 
 //takes an array with parentheses
@@ -87,17 +87,12 @@ function evaluateParentheses(array) {
   for (let i = 0; i < array.length; i++) {
     if (array[i] === "(") {
       parOpenIndex = i;
-      console.log(parOpenIndex + " open");
     } else if (array[i] === ")") {
       parCloseIndex = i;
-      console.log(parCloseIndex);
       parResult = evaluateArray(
         array.splice(parOpenIndex + 1, parCloseIndex - parOpenIndex - 1)
       );
       array.splice(parOpenIndex, 2, parResult);
-      console.log(parOpenIndex + " open");
-      console.log(parCloseIndex);
-      console.log(array.join(""));
       return array;
     }
     continue;
