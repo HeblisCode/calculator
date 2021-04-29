@@ -40,7 +40,7 @@ function doOperation(array, indexOfOperation, operation) {
 
 //takes an array of operations without parentheses
 //returns the results of the operations
-function evaluate(array) {
+function evaluateArray(array) {
   let currentOperation;
   while (array.indexOf("*") > 0) {
     currentOperation = "*";
@@ -77,6 +77,8 @@ function evaluate(array) {
   return array[0];
 }
 
+//takes an array with parentheses
+//returns the array with the innermost paretheses solved
 function evaluateParentheses(array) {
   let parOpenIndex;
   let parCloseIndex;
@@ -85,17 +87,28 @@ function evaluateParentheses(array) {
   for (let i = 0; i < array.length; i++) {
     if (array[i] === "(") {
       parOpenIndex = i;
+      console.log(parOpenIndex + " open");
     } else if (array[i] === ")") {
       parCloseIndex = i;
-      parResult = evaluate(
+      console.log(parCloseIndex);
+      parResult = evaluateArray(
         array.splice(parOpenIndex + 1, parCloseIndex - parOpenIndex - 1)
       );
       array.splice(parOpenIndex, 2, parResult);
+      console.log(parOpenIndex + " open");
+      console.log(parCloseIndex);
+      console.log(array.join(""));
       return array;
     }
     continue;
   }
 }
 
-let testArray = ["(", "4", "+", "2", ")", "*", "30", "/", "3"];
-console.log(evaluate(evaluateParentheses(testArray)));
+//takes an array with pharenteses and operations
+//return the result to the whole operation chain
+function evaluate(array) {
+  while (array.indexOf("(") >= 0) {
+    array = evaluateParentheses(array);
+  }
+  return evaluateArray(array);
+}
