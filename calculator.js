@@ -27,6 +27,10 @@ const calculator = {
     this.operationArray.push(parentheses);
   },
 
+  delete() {
+    this.currentNumber.pop();
+  },
+
   clear() {
     this.currentNumber = [];
     this.operationArray = [];
@@ -61,34 +65,22 @@ function clickNumber(e) {
   ) {
     return;
   }
-  ///
   calculator.pushDigit(e.target.id);
-  updateCurrentScreen(calculator.currentNumber);
-  updateOperationScreen(calculator.operationArray);
 }
 function clickOperation(e) {
   let last = calculator.operationArray[calculator.operationArray.length - 1];
+  //prevent multiple operations
   if (isNaN(last) && last !== "(" && last !== ")") {
     calculator.operationArray.pop();
   }
   calculator.pushOperation(e.target.id);
-  updateCurrentScreen(calculator.currentNumber);
-  updateOperationScreen(calculator.operationArray);
 }
 function clickParentheses(e) {
   calculator.pushParentheses(e.target.id);
-  updateCurrentScreen(calculator.currentNumber);
-  updateOperationScreen(calculator.operationArray);
 }
 function clickEqual() {
   calculator.operationArray.push(calculator.currentNumber.join("")); //push the last number
-  updateOperationScreen(calculator.operationArray);
   updateCurrentScreen(calculator.evaluate());
-}
-function clickClear() {
-  calculator.clear();
-  updateCurrentScreen(calculator.currentNumber);
-  updateOperationScreen(calculator.operationArray);
 }
 
 //init function**************************************************************************************************************
@@ -96,16 +88,30 @@ function init() {
   const numbers = document.querySelectorAll(".number");
   const operations = document.querySelectorAll(".operation");
   const parentheses = document.querySelectorAll(".parentheses");
+  const deleteButton = document.querySelector("#delete");
   const equal = document.querySelector("#equal");
   const clear = document.querySelector("#clear");
 
+  //buttons event listener
   numbers.forEach((number) => number.addEventListener("click", clickNumber));
   operations.forEach((operation) =>
     operation.addEventListener("click", clickOperation)
   );
   parentheses.forEach((par) => par.addEventListener("click", clickParentheses));
+  deleteButton.addEventListener("click", () => calculator.delete());
   equal.addEventListener("click", clickEqual);
-  clear.addEventListener("click", clickClear);
+  clear.addEventListener("click", () => calculator.clear());
+
+  //update view on every click or key press
+  window.addEventListener("click", function () {
+    updateOperationScreen(calculator.operationArray);
+    updateCurrentScreen(calculator.currentNumber);
+  });
+  window.addEventListener("keypress", function (e) {
+    updateOperationScreen(calculator.operationArray);
+    updateCurrentScreen(calculator.currentNumber);
+    console.log(e);
+  });
 }
 
-init();
+window.onload = init;
