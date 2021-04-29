@@ -1,3 +1,8 @@
+/*the evaluate function accept any array with this structure
+  example: ["1", "+", "2", "*", "(", "4", "-", "1", ")"]
+  if the parentheses structure is not correct or there'sa division 
+  by 0 it returns ["ERROR"]*/
+
 //basic operation, they take number arguments and return a number
 function add(a, b) {
   return a + b;
@@ -9,7 +14,7 @@ function multiply(a, b) {
   return a * b;
 }
 function divide(a, b) {
-  return b === 0 ? "ERROR" : a / b; //return "ERROR" if you divide by 0;
+  return b === 0 ? "ERROR DIV 0" : a / b; //return "ERROR" if you divide by 0;
 }
 
 //takes an array like ["1", "+", "1", "-", "3"], the index of the operation (1), and the operation to do ("+")
@@ -31,6 +36,7 @@ function doOperation(array, indexOfOperation, operation) {
       break;
     case "/":
       result = divide(+first, +second);
+      if (result === "ERROR DIV 0") return ["ERROR DIV 0"];
       break;
   }
 
@@ -39,7 +45,7 @@ function doOperation(array, indexOfOperation, operation) {
 }
 
 //takes an array of operations without parentheses
-//returns the results of the operations
+//returns an array with the result of the operations
 function evaluateArray(array) {
   let currentOperation;
   while (array.indexOf("*") > 0) {
@@ -57,17 +63,18 @@ function evaluateArray(array) {
       array.indexOf(currentOperation),
       currentOperation
     );
+    if (array.indexOf("ERROR DIV 0") >= 0) return ["ERROR DIV 0"];
   }
-  while (array.indexOf("+") > 0) {
-    currentOperation = "+";
+  while (array.indexOf("-") > 0) {
+    currentOperation = "-";
     array = doOperation(
       array,
       array.indexOf(currentOperation),
       currentOperation
     );
   }
-  while (array.indexOf("-") > 0) {
-    currentOperation = "-";
+  while (array.indexOf("+") > 0) {
+    currentOperation = "+";
     array = doOperation(
       array,
       array.indexOf(currentOperation),
@@ -92,6 +99,7 @@ function evaluateParentheses(array) {
       parResult = evaluateArray(
         array.splice(parOpenIndex + 1, parCloseIndex - parOpenIndex - 1)
       );
+      if (parResult.indexOf("ERROR DIV 0") >= 0) return ["ERROR DIV 0"];
       array.splice(parOpenIndex, 2, parResult);
       return array;
     }
@@ -99,11 +107,33 @@ function evaluateParentheses(array) {
   }
 }
 
+//checks if the structure is correct
+function parseArray(array) {
+  let parentheses = array.reduce(
+    function (obj, element) {
+      if (element === "(") {
+        obj.open++;
+        return obj;
+      } else if (element === ")") {
+        obj.close++;
+        return obj;
+      }
+      return obj;
+    },
+    { open: 0, close: 0 }
+  );
+  return parentheses.open === parentheses.close;
+}
+
 //takes an array with pharenteses and operations
 //return the result to the whole operation chain
 function evaluate(array) {
+  if (!parseArray(array)) return ["SYNTAX ERROR"];
+  if (array[0] === "-") array.unshift("0");
   while (array.indexOf("(") >= 0) {
+    if (array.indexOf("ERROR DIV 0") >= 0) return ["ERROR DIV 0"];
     array = evaluateParentheses(array);
   }
-  return evaluateArray(array);
+  let result = evaluateArray(array);
+  return isNaN(result) ? ["SYNTAX ERROR"] : result;
 }

@@ -2,52 +2,42 @@
 const calculator = {
   currentNumber: [],
   operationArray: [],
+  result: null,
 
   pushDigit(digit) {
+    if (this.result !== null && this.operationArray.length === 1) {
+      this.clear();
+    }
     this.currentNumber.push(digit);
   },
 
   pushOperation(operation) {
-    if (this.currentNumber.length === 0) {
-      this.operationArray.push(operation);
-    } else {
+    if (this.currentNumber.length !== 0) {
       this.operationArray.push(this.currentNumber.join(""));
-      this.operationArray.push(operation);
       this.currentNumber = [];
     }
+    this.operationArray.push(operation);
   },
 
-  parseArray() {
-    let parentheses = this.operationArray.reduce(
-      function (obj, element) {
-        if (element === "(") {
-          obj.open++;
-          return obj;
-        } else if (element === ")") {
-          obj.close++;
-          return obj;
-        }
-        return obj;
-      },
-      { open: 0, close: 0 }
-    );
-    return parentheses.open === parentheses.close;
+  pushParentheses(parentheses) {
+    if (this.currentNumber.length !== 0) {
+      this.operationArray.push(this.currentNumber.join(""));
+      this.currentNumber = [];
+    }
+    this.operationArray.push(parentheses);
   },
 
   clear() {
     this.currentNumber = [];
     this.operationArray = [];
+    this.result = null;
   },
 
+  //last number is pushed by the click listener
   evaluate() {
-    this.operationArray.push(this.currentNumber.join(""));
-    updateOperationScreen(calculator.operationArray);
     this.currentNumber = [];
-    if (!this.parseArray()) {
-      updateCurrentScreen(["ERROR"]);
-      return;
-    }
     this.operationArray = evaluate(this.operationArray); //see evaluate.js
+    this.result = this.operationArray[0];
     return this.operationArray;
   },
 };
@@ -64,21 +54,35 @@ function updateOperationScreen(array) {
 
 //click event listeners******************************************************************************************************
 function clickNumber(e) {
+  ///prevent multiple dots
   if (
     e.target.id === "." &&
     calculator.currentNumber[calculator.currentNumber.length - 1] === "."
   ) {
     return;
   }
+  ///
   calculator.pushDigit(e.target.id);
   updateCurrentScreen(calculator.currentNumber);
+  updateOperationScreen(calculator.operationArray);
 }
 function clickOperation(e) {
+  let last = calculator.operationArray[calculator.operationArray.length - 1];
+  if (isNaN(last) && last !== "(" && last !== ")") {
+    calculator.operationArray.pop();
+  }
   calculator.pushOperation(e.target.id);
   updateCurrentScreen(calculator.currentNumber);
   updateOperationScreen(calculator.operationArray);
 }
+function clickParentheses(e) {
+  calculator.pushParentheses(e.target.id);
+  updateCurrentScreen(calculator.currentNumber);
+  updateOperationScreen(calculator.operationArray);
+}
 function clickEqual() {
+  calculator.operationArray.push(calculator.currentNumber.join("")); //push the last number
+  updateOperationScreen(calculator.operationArray);
   updateCurrentScreen(calculator.evaluate());
 }
 function clickClear() {
@@ -91,6 +95,7 @@ function clickClear() {
 function init() {
   const numbers = document.querySelectorAll(".number");
   const operations = document.querySelectorAll(".operation");
+  const parentheses = document.querySelectorAll(".parentheses");
   const equal = document.querySelector("#equal");
   const clear = document.querySelector("#clear");
 
@@ -98,6 +103,7 @@ function init() {
   operations.forEach((operation) =>
     operation.addEventListener("click", clickOperation)
   );
+  parentheses.forEach((par) => par.addEventListener("click", clickParentheses));
   equal.addEventListener("click", clickEqual);
   clear.addEventListener("click", clickClear);
 }
