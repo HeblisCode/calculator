@@ -18,7 +18,20 @@ const calculator = {
   },
 
   parseArray() {
-    return true;
+    let parentheses = this.operationArray.reduce(
+      function (obj, element) {
+        if (element === "(") {
+          obj.open++;
+          return obj;
+        } else if (element === ")") {
+          obj.close++;
+          return obj;
+        }
+        return obj;
+      },
+      { open: 0, close: 0 }
+    );
+    return parentheses.open === parentheses.close;
   },
 
   clear() {
@@ -28,9 +41,12 @@ const calculator = {
 
   evaluate() {
     this.operationArray.push(this.currentNumber.join(""));
-    updateOldScreen(calculator.operationArray);
+    updateOperationScreen(calculator.operationArray);
     this.currentNumber = [];
-    if (!this.parseArray()) return "ERROR";
+    if (!this.parseArray()) {
+      updateCurrentScreen(["ERROR"]);
+      return;
+    }
     this.operationArray = evaluate(this.operationArray); //see evaluate.js
     return this.operationArray;
   },
@@ -41,20 +57,26 @@ function updateCurrentScreen(array) {
   const currentScreen = document.querySelector("#currentScreen");
   currentScreen.innerText = array.join("");
 }
-function updateOldScreen(array) {
-  const oldScreen = document.querySelector("#oldScreen");
-  oldScreen.innerText = array.join("");
+function updateOperationScreen(array) {
+  const operationScreen = document.querySelector("#operationScreen");
+  operationScreen.innerText = array.join("");
 }
 
 //click event listeners******************************************************************************************************
 function clickNumber(e) {
+  if (
+    e.target.id === "." &&
+    calculator.currentNumber[calculator.currentNumber.length - 1] === "."
+  ) {
+    return;
+  }
   calculator.pushDigit(e.target.id);
   updateCurrentScreen(calculator.currentNumber);
 }
 function clickOperation(e) {
   calculator.pushOperation(e.target.id);
   updateCurrentScreen(calculator.currentNumber);
-  updateOldScreen(calculator.operationArray);
+  updateOperationScreen(calculator.operationArray);
 }
 function clickEqual() {
   updateCurrentScreen(calculator.evaluate());
@@ -62,9 +84,10 @@ function clickEqual() {
 function clickClear() {
   calculator.clear();
   updateCurrentScreen(calculator.currentNumber);
-  updateOldScreen(calculator.operationArray);
+  updateOperationScreen(calculator.operationArray);
 }
 
+//init function**************************************************************************************************************
 function init() {
   const numbers = document.querySelectorAll(".number");
   const operations = document.querySelectorAll(".operation");
