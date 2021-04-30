@@ -38,7 +38,7 @@ body {
   );
 }
 
-/*CALCULATOR FLEX STYLING******************************************************/
+/*CALCULATOR BOX STYLING******************************************************/
 #calculatorFlexbox {
   display: flex;
   flex-direction: column;
@@ -90,14 +90,17 @@ body {
   margin-top: 20px;
 }
 button {
+  user-select: none;
   border: none;
   font-family: "Kanit", sans-serif;
   font-size: 20px;
   border-radius: 3px;
+  transition: all 0.05s;
 }
 button:hover {
-  opacity: 0.6;
-  transform: scale(1.02);
+  box-sizing: border-box;
+  margin: 2px;
+  opacity: 0.9;
 }
 .number {
   background-color: var(--darkGrey);
@@ -106,6 +109,23 @@ button:hover {
 .operation {
   background-color: var(--orange);
   font-size: 30px;
+}
+
+/*AUTHOR STYLING*********************************/
+#author {
+  position: absolute;
+  right: 18px;
+  bottom: 12px;
+  text-decoration: underline;
+  opacity: 0.8;
+}
+#author > a:hover {
+  color: var(--orange);
+}
+#author > a {
+  text-decoration: none;
+  color: var(--lightGrey);
+  font-size: 16px;
 }
 
 /*CLASSES**********************************************************************/

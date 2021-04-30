@@ -8,6 +8,13 @@ const calculator = {
     if (this.result !== null && this.operationArray.length === 1) {
       this.clear();
     }
+    //prevents multiple dots
+    if (
+      digit === "." &&
+      this.currentNumber[this.currentNumber.length - 1] === "."
+    ) {
+      return;
+    }
     this.currentNumber.push(digit);
   },
 
@@ -17,7 +24,7 @@ const calculator = {
       this.currentNumber = [];
     }
 
-    // prevent multiple operations
+    //prevents multiple operations
     let last = this.operationArray[this.operationArray.length - 1];
     if (isNaN(last) && last !== "(" && last !== ")") {
       this.operationArray.pop();
@@ -67,13 +74,6 @@ function updateOperationScreen(array) {
 
 //click event listeners******************************************************************************************************
 function clickNumber(e) {
-  ///prevent multiple dots
-  if (
-    e.target.id === "." &&
-    calculator.currentNumber[calculator.currentNumber.length - 1] === "."
-  ) {
-    return;
-  }
   calculator.pushDigit(e.target.id);
 }
 function clickOperation(e) {
@@ -82,8 +82,24 @@ function clickOperation(e) {
 function clickParentheses(e) {
   calculator.pushParentheses(e.target.id);
 }
-function clickEqual() {
-  updateCurrentScreen(calculator.evaluate());
+
+//keypress event listener****************************************************************************************************
+function pressKey(e) {
+  const operators = ["+", "/", "*", "-"];
+
+  if (!isNaN(e.key) || e.key === ".") {
+    calculator.pushDigit(e.key);
+  } else if (operators.indexOf(e.key) >= 0) {
+    calculator.pushOperation(e.key);
+  } else if (e.key === "Enter") {
+    calculator.evaluate();
+  } else if (e.key === "(" || e.key === ")") {
+    calculator.pushParentheses(e.key);
+  } else if (e.key === "c") {
+    calculator.delete();
+  } else if (e.key === "a") {
+    calculator.clear();
+  }
 }
 
 //init function**************************************************************************************************************
@@ -95,14 +111,14 @@ function init() {
   const equal = document.querySelector("#equal");
   const clear = document.querySelector("#clear");
 
-  //buttons event listener
+  //buttons event listeners
   numbers.forEach((number) => number.addEventListener("click", clickNumber));
   operations.forEach((operation) =>
     operation.addEventListener("click", clickOperation)
   );
   parentheses.forEach((par) => par.addEventListener("click", clickParentheses));
   deleteButton.addEventListener("click", () => calculator.delete());
-  equal.addEventListener("click", clickEqual);
+  equal.addEventListener("click", () => calculator.evaluate());
   clear.addEventListener("click", () => calculator.clear());
 
   //update view on every click or key press
@@ -110,11 +126,13 @@ function init() {
     updateOperationScreen(calculator.operationArray);
     updateCurrentScreen(calculator.currentNumber);
   });
-  window.addEventListener("keypress", function (e) {
+  window.addEventListener("keyup", function () {
     updateOperationScreen(calculator.operationArray);
     updateCurrentScreen(calculator.currentNumber);
-    console.log(e);
   });
+
+  //keypress event listener
+  window.addEventListener("keypress", (e) => pressKey(e));
 }
 
 window.onload = init;
