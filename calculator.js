@@ -16,6 +16,13 @@ const calculator = {
       this.operationArray.push(this.currentNumber.join(""));
       this.currentNumber = [];
     }
+
+    // prevent multiple operations
+    let last = this.operationArray[this.operationArray.length - 1];
+    if (isNaN(last) && last !== "(" && last !== ")") {
+      this.operationArray.pop();
+    }
+
     this.operationArray.push(operation);
   },
 
@@ -37,8 +44,10 @@ const calculator = {
     this.result = null;
   },
 
-  //last number is pushed by the click listener
   evaluate() {
+    if (this.currentNumber.length !== 0) {
+      this.operationArray.push(this.currentNumber.join(""));
+    }
     this.currentNumber = [];
     this.operationArray = evaluate(this.operationArray); //see evaluate.js
     this.result = this.operationArray[0];
@@ -68,18 +77,12 @@ function clickNumber(e) {
   calculator.pushDigit(e.target.id);
 }
 function clickOperation(e) {
-  let last = calculator.operationArray[calculator.operationArray.length - 1];
-  //prevent multiple operations
-  if (isNaN(last) && last !== "(" && last !== ")") {
-    calculator.operationArray.pop();
-  }
   calculator.pushOperation(e.target.id);
 }
 function clickParentheses(e) {
   calculator.pushParentheses(e.target.id);
 }
 function clickEqual() {
-  calculator.operationArray.push(calculator.currentNumber.join("")); //push the last number
   updateCurrentScreen(calculator.evaluate());
 }
 
