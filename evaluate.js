@@ -17,18 +17,12 @@ function evaluate(array) {
 }
 
 //basic operation, they take number arguments and return a number
-function add(a, b) {
-  return a + b;
-}
-function subtract(a, b) {
-  return a - b;
-}
-function multiply(a, b) {
-  return a * b;
-}
-function divide(a, b) {
+const add = (a, b) => a + b;
+const subtract = (a, b) => a - b;
+const multiply = (a, b) => a * b;
+const divide = (a, b) => {
   return b === 0 ? "ERROR DIV 0" : a / b; //return "ERROR DIV 0" if you divide by 0;
-}
+};
 
 //takes an array like ["1", "+", "1", "-", "3"], the index of the operation (1), and the operation to do ("+")
 //returns an array with the result of the operation ["2", "-", "3"]

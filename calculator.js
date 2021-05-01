@@ -42,6 +42,9 @@ const calculator = {
   },
 
   delete() {
+    if (this.currentNumber.length === 0) {
+      this.currentNumber = this.operationArray.pop().split("");
+    }
     this.currentNumber.pop();
   },
 
@@ -112,14 +115,18 @@ function init() {
   const clear = document.querySelector("#clear");
 
   //buttons event listeners
-  numbers.forEach((number) => number.addEventListener("click", clickNumber));
-  operations.forEach((operation) =>
-    operation.addEventListener("click", clickOperation)
+  numbers.forEach((number) =>
+    number.addEventListener("mousedown", clickNumber)
   );
-  parentheses.forEach((par) => par.addEventListener("click", clickParentheses));
-  deleteButton.addEventListener("click", () => calculator.delete());
-  equal.addEventListener("click", () => calculator.evaluate());
-  clear.addEventListener("click", () => calculator.clear());
+  operations.forEach((operation) =>
+    operation.addEventListener("mousedown", clickOperation)
+  );
+  parentheses.forEach((par) =>
+    par.addEventListener("mousedown", clickParentheses)
+  );
+  deleteButton.addEventListener("mousedown", () => calculator.delete());
+  equal.addEventListener("mousedown", () => calculator.evaluate());
+  clear.addEventListener("mousedown", () => calculator.clear());
 
   //update view on every click or key press
   window.addEventListener("click", function () {
@@ -135,4 +142,4 @@ function init() {
   window.addEventListener("keypress", (e) => pressKey(e));
 }
 
-window.onload = init;
+init();
